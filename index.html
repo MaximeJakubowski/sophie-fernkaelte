@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fernkälte Cost Estimator</title>
+    <style>
+        /* General Body and Font Styles */
+        html {
+            scroll-behavior: smooth; /* For smooth scrolling */
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f9fafb; 
+            color: #1f2937; 
+            margin: 0;
+            padding: 1rem;
+        }
+
+        /* Main container */
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: #ffffff; 
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+
+        h1 {
+            font-size: 1.875rem;
+            font-weight: 700; 
+            margin-bottom: 1rem; 
+            color: #111827;
+        }
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem; 
+            color: #111827;
+        }
+        h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #111827;
+        }
+        p {
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+        .intro-text {
+            margin-bottom: 1.5rem;
+            color: #4b5563; 
+        }
+
+        a {
+            color: #2563eb; 
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* Calculator section */
+        .calculator-section {
+            padding: 1.5rem; 
+            background-color: #f9fafb; 
+            border-radius: 0.5rem; 
+            margin-bottom: 2rem;
+        }
+        .input-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        @media (min-width: 768px) { 
+            .input-grid {
+                grid-template-columns: 1fr 1fr; 
+            }
+        }
+        label {
+            display: block;
+            font-weight: 500; 
+            margin-bottom: 0.5rem; 
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db; 
+            border-radius: 0.375rem;
+            box-sizing: border-box;
+        }
+        .input-note {
+            font-size: 0.75rem; 
+            color: #6b7280;
+            margin-top: 0.25rem; 
+        }
+        .formula {
+            background-color: #e5e7eb;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+            font-family: monospace;
+            font-size: 1rem;
+            line-height: 1.5;
+            overflow-x: auto;
+        }
+        .result {
+            font-weight: bold;
+            color: #166534;
+            font-size: 1.25rem;
+        }
+        .result-display {
+            font-family: monospace;
+            font-size: 1.25rem;
+        }
+
+        /* FAQ Section */
+        .faq-item {
+            border-top: 1px solid #d1d5db;
+            padding-top: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        .faq-link {
+            font-size: 0.8rem;
+            font-weight: normal;
+        }
+        .assumption {
+             background-color: #fff7a0; 
+             border-left: 4px solid #facc15;
+             padding: 1rem;
+             margin-top: 1rem;
+             border-radius: 0.25rem;
+        }
+        ul.styled-list {
+            list-style-position: inside;
+            list-style-type: disc;
+            margin-top: 0.5rem;
+            padding: 1rem;
+            background-color: #f3f4f6;
+            border-radius: 0.375rem;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Fernkälte Cost Estimator</h1>
+        <p class="intro-text">This webpage is designed to help estimate the <a href="https://positionen.wienenergie.at/wissenshub/einfach-erklaert/rund-um-die-energiewende/einfach-erklaert-fernkaelte/"  target="_blank">Fernkälte</a> (district cooling) costs within our apartment building, based on a few key values.</p>
+
+        <div class="calculator-section">
+            <h2>Simplified Weekly Calculation</h2>
+            <p>First, let's estimate the cost for one week of continuous cooling. <a href="#faq-assumptions" class="faq-link">(See assumptions)</a></p>
+            
+            <div class="input-grid">
+                <div>
+                    <label for="cost_per_mwh">Cost per MWh (€) <a href="#faq-mwh" class="faq-link">(What is MWh?)</a></label>
+                    <input type="number" id="cost_per_mwh" value="180">
+                    <p class="input-note">(Enter the "Arbeitspreis" from your contract.)</p>
+                </div>
+                <div>
+                    <label for="square_meters">Cooled Area (m²):</label>
+                    <input type="number" id="square_meters" value="80">
+                </div>
+                 <div>
+                    <label for="total_kwh_usage">Total Weekly Usage (kWh) <a href="#faq-usage" class="faq-link">(How to determine?)</a></label>
+                    <input type="number" id="total_kwh_usage" value="72" step="1">
+                    <p class="input-note">(Enter your measured difference value.)</p>
+                </div>
+                <div>
+                    <strong>Calculated Usage per m²/week:</strong>
+                    <p class="result-display" id="kwh_per_sqm_display">0.0 kWh/m²</p>
+                    <p class="input-note">(Total Usage / Area)</p>
+                </div>
+            </div>
+
+            <div class="formula">
+                <strong>Formula:</strong><br>
+                Weekly Cost = (Total Weekly Usage) &times; (Cost per MWh / 1000)
+            </div>
+
+            <p>The estimated cost per cooling week is: <span id="weekly_cost_result" class="result">€0.00</span></p>
+        </div>
+
+        <div class="mt-8">
+            <h2>FAQ</h2>
+
+            <div class="faq-item" id="faq-mwh">
+                <h3>What is a Megawatt-hour (MWh)?</h3>
+                <p>A <strong>Megawatt-hour (MWh)</strong> is a unit of energy, just like a kilowatt-hour (kWh), but much larger. Energy companies often use it on bills to keep the numbers smaller and simpler.</p>
+                <p>The conversion is simple:</p>
+                <ul class="styled-list">
+                    <li>1 Megawatt-hour (MWh) = 1,000 Kilowatt-hours (kWh)</li>
+                </ul>
+                <p>Think of it like kilometers and meters. To convert the price from MWh to kWh, you just divide by 1,000. For example, €180 per MWh is the same as €0.18 per kWh.</p>
+            </div>
+
+            <div class="faq-item" id="faq-measure">
+                <h3>How is the cooling measured?</h3>
+                <p><strong>Simple answer:</strong> In the amount of energy, measured in <a href="https://en.wikipedia.org/wiki/Kilowatt-hour" target="_blank">kilowatt-hours (kWh)</a>, that the district cooling system removes from your apartment.</p>
+                <p><strong>Long answer:</strong> Both heating and cooling are forms of thermal energy. Your consumption is measured by a special meter called a <a href="https://www.ista.com/de/technik/waerme-und-kaeltezaehler/" target="_blank"><strong>Kältezähler</strong></a> (cooling meter). This device uses two key measurements to calculate your energy usage:</p>
+                <ul class="styled-list">
+                    <li><strong>Volume Flow:</strong> It measures how much chilled water flows through your apartment's cooling circuit (e.g., your floor pipes).</li>
+                    <li><strong>Temperature Difference:</strong> It has two sensors. One measures the temperature of the water as it enters your apartment (Vorlauf), and the other measures it as it leaves after absorbing heat (Rücklauf).</li>
+                </ul>
+                <p>The meter continuously multiplies the volume of water by the temperature difference. This calculation determines how much heat energy was transferred from your apartment to the water, which is then displayed in kWh.</p>
+            </div>
+
+            <div class="faq-item" id="faq-usage">
+                <h3>How do I determine my cooling usage?</h3>
+                <p>You can easily measure your own consumption to get a precise value. The meter (Kältezähler) is located inside your apartment, typically close to your entrance door.</p>
+                <ol class="styled-list" style="list-style-type: decimal;">
+                    <li>Locate the meter and find the digital display showing the value in <strong>kWh</strong>.</li>
+                    <li>Note down the full number at the beginning of a period (e.g., Monday at 9:00 AM).</li>
+                    <li>Note down the number at the end of the period (e.g., the following Monday at 9:00 AM).</li>
+                    <li>Subtract the first reading from the second to find your exact kWh usage for that week. This is your "Total Weekly Usage" value.</li>
+                </ol>
+            </div>
+            
+            <div class="faq-item" id="faq-assumptions">
+                 <h3>Assumptions made in this calculator</h3>
+                 <div class="assumption">
+                    <p>This simple calculator operates on a few assumptions to provide a baseline estimate:</p>
+                    <ul class="styled-list">
+                        <li>The cooling system is running continuously throughout the week.</li>
+                        <li>The apartment is never fully cooled to its target temperature (meaning the system doesn't switch off).</li>
+                        <li>Your weekly measurement is a good average. Your actual usage will vary based on weather, sun exposure, and personal habits.</li>
+                    </ul>
+                 </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Get DOM Elements ---
+        const costPerMwhInput = document.getElementById('cost_per_mwh');
+        const squareMetersInput = document.getElementById('square_meters');
+        const totalKwhUsageInput = document.getElementById('total_kwh_usage');
+        const kwhPerSqmDisplay = document.getElementById('kwh_per_sqm_display');
+        const weeklyCostResult = document.getElementById('weekly_cost_result');
+        
+        // --- Calculation Function ---
+        function calculateCosts() {
+            // Use parseFloat to handle decimal values and provide a fallback of 0.
+            const costPerMwh = parseFloat(costPerMwhInput.value) || 0;
+            const area = parseFloat(squareMetersInput.value) || 0;
+            const totalKwhUsage = parseFloat(totalKwhUsageInput.value) || 0;
+
+            // 1. Calculate and display the usage per square meter
+            let kwhPerSqm = 0;
+            if (area > 0) { // Avoid division by zero
+                kwhPerSqm = totalKwhUsage / area;
+            }
+            kwhPerSqmDisplay.textContent = `${kwhPerSqm.toFixed(2)} kWh/m²`;
+
+            // 2. Convert MWh price to kWh price
+            const costPerKwh = costPerMwh / 1000;
+            
+            // 3. Calculate weekly cost
+            const weeklyCost = totalKwhUsage * costPerKwh;
+            weeklyCostResult.textContent = `€${weeklyCost.toFixed(2)}`;
+        }
+
+        // --- Event Listeners to trigger calculation on input change ---
+        costPerMwhInput.addEventListener('input', calculateCosts);
+        squareMetersInput.addEventListener('input', calculateCosts);
+        totalKwhUsageInput.addEventListener('input', calculateCosts);
+
+        // --- Initial Calculation ---
+        // Run the calculation once on page load to show results for the default values.
+        calculateCosts();
+    </script>
+
+</body>
+</html>
